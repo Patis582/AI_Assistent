@@ -10,7 +10,9 @@ export async function POST(req: Request) {
 
     const prompt = `
 
-    
+    - Spočítej risk:reward.
+    - Shrň confluence body a dej mi krátký závěr obchodu.
+    - Odpověz stručně a přehledně.
     `;
 
     const result = await model.generateContent(prompt);
