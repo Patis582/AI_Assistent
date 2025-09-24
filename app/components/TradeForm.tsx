@@ -20,6 +20,20 @@ export default function TradeForm() {
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const confulencesList = [
+    "Pattern 5m/15m",
+    "Pattern 30m/H1",
+    "Break 30m/H1 low/high",
+    "Odraz 30m/H1 low/high",
+    "Odraz/break H4 SR",
+    "H4 trend",
+    "Trendline break",
+    "Svíčkové formace 30m/H1",
+    "Svíčkové formace H4",
+    "Nedodělaný wick",
+    "Potvrzení",
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -130,12 +144,9 @@ export default function TradeForm() {
               className="w-full border border-gray-300 rounded-md px-3 py-2 h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
-              <option value="H4 trend">H4 trend</option>
-              <option value="H4 break/odraz">H4 break/odraz</option>
-              <option value="Pattern break">Pattern break</option>
-              <option value="m30/H1 break/odraz">m30/H1 break/odraz</option>
-              <option value="Nedodělaný wick">Nedodělaný wick</option>
-              <option value="Svíčková formace">Svíčková formace</option>
+              {confulencesList.map((confulence)=> (
+                <option key={confulence} value={confulence}>{confulence}</option>
+              ))}
             </select>
             <p className="text-xs text-gray-500 mt-1">
               Hold Ctrl/Cmd to select multiple
