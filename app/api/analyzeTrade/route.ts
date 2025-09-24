@@ -134,13 +134,15 @@ ${index + 1}. ID: ${trade.id}
 `).join("")}
 
 ÚKOLY:
-1. Najdi v historických datech podobné obchody jako je nový obchod (podobná pozice, confluences, session)
-2. Spočítaj success rate těchto podobných obchodů
-3. Vyhodnoť šanci na úspěch nového obchodu
-4. Doporuč případné úpravy (RR, SL, atd.)
-5. Shrň confluence body a jejich vliv na výsledek
-
-Odpověz v češtině, strukturovaně a prakticky. Na začátku napiš kolik podobných obchodů jsi našel a jejich success rate.
+1) Najdi v historických datech podobné obchody jako je nový obchod (podobná pozice, confluences, session, Order Type, SL pips, RR). Největší váhu dávej confluences, pak session, SL, RR, order type.
+    Spočítej success rate těchto úpdpbných obchodů
+2) Vyhodnoť šanci na úspěch nového obchodu 
+3) Konkrétní doporučení (vstup/RR/SL)
+4) Kolik má obchod v průměru PnL
+5) Doporuč případné úpravy (RR, SL, atd.)
+6) Shrň confluence body a jejich vliv na výsledek
+Success rate a podobné obchody napiš uplně první ve formě: Success rate: 80%. Na další řádek Podobné obchody: 10. Potom vynech jeden řádek.
+Všechny ukoly shrň do max 10 vět
     `;
 
     const result = await model.generateContent(prompt);

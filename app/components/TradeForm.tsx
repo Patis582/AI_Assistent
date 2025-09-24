@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 
+interface AnalysisResult {
+  output: string;
+  stats: {
+    totalTrades: number;
+    analysisPerformed: boolean;
+  };
+}
+
 export default function TradeForm() {
   const [position, setPosition] = useState("");
   const [session, setSession] = useState("New York");
@@ -9,7 +17,7 @@ export default function TradeForm() {
   const [orderType, setOrderType] = useState("limit");
   const [sl, setSl] = useState("");
   const [rr, setRr] = useState("");
-  const [analysis, setAnalysis] = useState("");
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,13 +45,13 @@ export default function TradeForm() {
       const result = await response.json();
 
       if (result.error) {
-        setAnalysis(`Chyba: ${result.error}`);
+        setAnalysis(null);
       } else {
-        setAnalysis(result.output);
+        setAnalysis(result);
       }
     } catch (error) {
       console.error("Chyba při analýze:", error);
-      setAnalysis("Došlo k chybě při analýze obchodu. Zkuste to znovu.");
+      setAnalysis(null);
     } finally {
       setLoading(false);
     }
@@ -174,9 +182,16 @@ export default function TradeForm() {
 
         {/* Výsledky */}
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">
-            📈 Analýza obchodu
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-800">
+              📈 Analýza obchodu
+            </h3>
+            {analysis && (
+              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                📊 {analysis.stats.totalTrades} obchodů v databázi
+              </div>
+            )}
+          </div>
 
           {loading && (
             <div className="flex items-center justify-center py-8">
@@ -188,9 +203,19 @@ export default function TradeForm() {
           )}
 
           {analysis && !loading && (
-            <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                {analysis}
+            <div className="space-y-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <div className="text-sm text-blue-700">
+                  ✅ Analyzováno na základě{" "}
+                  <strong>{analysis.stats.totalTrades}</strong> historických
+                  obchodů
+                </div>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {analysis.output}
+                </div>
               </div>
             </div>
           )}
