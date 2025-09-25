@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Optimalizace
+  compress: true,
+  poweredByHeader: false,
+  
+  // Experimental optimalizace
+  experimental: {
+    optimizePackageImports: ['@google/generative-ai', '@notionhq/client']
+  }
 };
 
 export default nextConfig;
