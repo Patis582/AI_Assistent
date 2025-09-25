@@ -2,6 +2,12 @@ import { Client } from "@notionhq/client";
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
+// CACHE
+let tradesCache: Trade[] | null = null;
+let confluencesCache: string[] | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minut
+
 // Typy
 export interface NotionPage {
   id: string;
@@ -56,11 +62,23 @@ export async function getRelationTitles(relations: Array<{ id: string }>): Promi
 }
 
 export async function getHistoricalTrades(): Promise<Trade[]> {
+  const now = Date.now();
+  
+  // Pokud máme fresh cache, použij ho
+  if (tradesCache && (now - cacheTimestamp) < CACHE_DURATION) {
+    console.log('📦 Používám cached data');
+    return tradesCache;
+  }
+
+  console.log('🔄 Načítám fresh data z Notion...');
+  
   try {
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID!,
     });
 
+    const confluenceSet = new Set<string>();
+    
     const trades = await Promise.all(
       response.results.map(async (page: unknown) => {
         const notionPage = page as NotionPage;
@@ -70,27 +88,54 @@ export async function getHistoricalTrades(): Promise<Trade[]> {
           return p[key] as NotionProperty | undefined;
         };
 
+        const confluences = await getRelationTitles(getProp("Confluences")?.relation || []);
+        const order_type = await getRelationTitles(getProp("Order Type")?.relation || []);
+        const session = await getRelationTitles(getProp("Session")?.relation || []);
+        const mistakes = await getRelationTitles(getProp("Mistakes")?.relation || []);
+
+        // Současně sbírej confluences pro cache
+        confluences.forEach(c => {
+          if (c && c !== 'Unknown') confluenceSet.add(c);
+        });
+        
         return {
           id: notionPage.id,
           position: getProp("Position")?.select?.name || "",
           date: getProp("Entry / Exit Date")?.date?.start || "",
           rr: getProp("Actual RR achieved: W(+1), L(-1), BE(0)")?.number ?? null,
           outcome: getProp("Outcome")?.formula?.string || "",
-          confluences: await getRelationTitles(getProp("Confluences")?.relation || []),
-          order_type: await getRelationTitles(getProp("Order Type")?.relation || []),
-          session: await getRelationTitles(getProp("Session")?.relation || []),
+          confluences: confluences,
+          order_type: order_type,
+          session: session,
           sl: getProp("S/L Pips")?.number ?? null,
           risk: getProp("% Risk")?.number ?? null,
           pnl: getProp("Gross PnL")?.number ?? null,
-          mistakes: await getRelationTitles(getProp("Mistakes")?.relation || []),
+          mistakes: mistakes,
           notes: getProp("Notes")?.rich_text?.[0]?.plain_text || ""
         };
       })
     );
 
+    // Uložit do cache
+    tradesCache = trades;
+    confluencesCache = Array.from(confluenceSet).sort();
+    cacheTimestamp = now;
+
+    console.log(`✅ Načteno ${trades.length} obchodů do cache`);
     return trades;
   } catch (error) {
     console.error("Chyba při načítání dat z Notion:", error);
-    return [];
+    return tradesCache || []; // Fallback na starší cache
   }
+}
+
+export async function getConfluences(): Promise<string[]> {
+  // Pokud máme cached confluences, použij je
+  if (confluencesCache && (Date.now() - cacheTimestamp) < CACHE_DURATION) {
+    return confluencesCache;
+  }
+  
+  // Jinak načti trades (což naplní i confluences cache)
+  await getHistoricalTrades();
+  return confluencesCache || [];
 }
