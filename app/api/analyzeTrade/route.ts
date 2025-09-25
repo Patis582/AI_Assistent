@@ -71,6 +71,7 @@ FORMÁT:
       stats: { totalTrades: historicalTrades.length, analysisPerformed: true }
     });
   } catch (error) {
+    console.error("Chyba při analýze:", error); // Přidáno pro podrobnější sledování chyb
     return NextResponse.json({ error: "Chyba při analýze" }, { status: 500 });
   }
 }
@@ -85,6 +86,7 @@ export async function GET() {
     
     return NextResponse.json(confluences);
   } catch (error) {
+    console.error("Chyba při načítání confluences:", error); // Přidáno pro podrobnější sledování chyb
     return NextResponse.json([], { status: 500 });
   }
 }

@@ -101,11 +101,11 @@ export default function TradeChat() {
               💡 Příklady otázek:
             </h4>
             <div className="text-xs text-blue-700 space-y-1">
-              <div>• "Jaký mám celkový success rate?"</div>
-              <div>• "Které confluences mají nejlepší výsledky?"</div>
-              <div>• "Kolik jsem vydělal/ztratil tento měsíc?"</div>
-              <div>• "Jaké jsou mé nejčastější chyby?"</div>
-              <div>• "Která session je pro mě nejziskovější?"</div>
+              <div>• &quot;Jaký mám celkový success rate?&quot;</div>
+              <div>• &quot;Které confluences mají nejlepší výsledky?&quot;</div>
+              <div>• &quot;Kolik jsem vydělal/ztratil tento měsíc?&quot;</div>
+              <div>• &quot;Jaké jsou mé nejčastější chyby?&quot;</div>
+              <div>• &quot;Která session je pro mě nejziskovější?&quot;</div>
             </div>
           </div>
         </div>
