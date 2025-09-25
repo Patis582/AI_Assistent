@@ -17,6 +17,7 @@ export default function TradeForm() {
   const [orderType, setOrderType] = useState("limit");
   const [sl, setSl] = useState("");
   const [rr, setRr] = useState("");
+  const [notes, setNotes] = useState(""); // Přidat tento řádek
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +46,7 @@ export default function TradeForm() {
       orderType,
       sl: Number(sl),
       rr: Number(rr),
+      notes,
     };
 
     console.log("New trade input:", tradeInput);
@@ -195,6 +197,22 @@ export default function TradeForm() {
               placeholder="např. 20"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Poznámka k obchodu
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              placeholder="Dodatečné informace o obchodu (nepovinné)..."
+              rows={3}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Např. market sentiment, novinky, setup detail...
+            </p>
           </div>
 
           <button

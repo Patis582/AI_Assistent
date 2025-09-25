@@ -1,6 +1,7 @@
 "use client";
 
 import TradeForm from "./components/TradeForm";
+import TradeChat from "./components/TradeChat";
 
 export default function NotionPage() {
   return (
@@ -21,12 +22,23 @@ export default function NotionPage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <TradeForm />
+        <div className="space-y-8">
+          {/* Trading Form */}
+          <TradeForm />
+
+          {/* Chat Assistant */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Zeptej se AI na cokoliv o svých obchodech
+            </h2>
+            <TradeChat />
+          </div>
+        </div>
       </div>
 
       {/* Simple Footer */}
       <div className="text-center py-6 text-sm text-gray-500">
-        <p>Moje vlastní AI analýza • Gemini + Notion</p>
+        <p>AI analýza • Gemini + Notion</p>
       </div>
     </div>
   );
