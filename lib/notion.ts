@@ -2,11 +2,10 @@ import { Client } from "@notionhq/client";
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
-// CACHE
+// STARTUP CACHE - načte se jednou při startu
 let tradesCache: Trade[] | null = null;
 let confluencesCache: string[] | null = null;
-let cacheTimestamp: number = 0;
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minut
+let isLoaded = false;
 
 // Typy
 export interface NotionPage {
@@ -61,16 +60,11 @@ export async function getRelationTitles(relations: Array<{ id: string }>): Promi
   return Promise.all(relations.map(r => getPageTitle(r.id)));
 }
 
-export async function getHistoricalTrades(): Promise<Trade[]> {
-  const now = Date.now();
+// Načti data při startu aplikace
+async function initializeData(): Promise<void> {
+  if (isLoaded) return; // Už je načteno
   
-  // Pokud máme fresh cache, použij ho
-  if (tradesCache && (now - cacheTimestamp) < CACHE_DURATION) {
-    console.log('📦 Používám cached data');
-    return tradesCache;
-  }
-
-  console.log('🔄 Načítám fresh data z Notion...');
+  console.log('🚀 Inicializuji data při startu aplikace...');
   
   try {
     const response = await notion.databases.query({
@@ -93,7 +87,6 @@ export async function getHistoricalTrades(): Promise<Trade[]> {
         const session = await getRelationTitles(getProp("Session")?.relation || []);
         const mistakes = await getRelationTitles(getProp("Mistakes")?.relation || []);
 
-        // Současně sbírej confluences pro cache
         confluences.forEach(c => {
           if (c && c !== 'Unknown') confluenceSet.add(c);
         });
@@ -116,26 +109,31 @@ export async function getHistoricalTrades(): Promise<Trade[]> {
       })
     );
 
-    // Uložit do cache
     tradesCache = trades;
     confluencesCache = Array.from(confluenceSet).sort();
-    cacheTimestamp = now;
+    isLoaded = true;
 
-    console.log(`✅ Načteno ${trades.length} obchodů do cache`);
-    return trades;
+    console.log(`✅ Inicializováno ${trades.length} obchodů při startu`);
   } catch (error) {
-    console.error("Chyba při načítání dat z Notion:", error);
-    return tradesCache || []; // Fallback na starší cache
+    console.error("❌ Chyba při inicializaci dat:", error);
+    tradesCache = [];
+    confluencesCache = [];
+    isLoaded = true; // I při chybě označit jako "pokus proběhl"
   }
 }
 
+export async function getHistoricalTrades(): Promise<Trade[]> {
+  await initializeData(); // Zajisti načtení při prvním volání
+  return tradesCache || [];
+}
+
 export async function getConfluences(): Promise<string[]> {
-  // Pokud máme cached confluences, použij je
-  if (confluencesCache && (Date.now() - cacheTimestamp) < CACHE_DURATION) {
-    return confluencesCache;
-  }
-  
-  // Jinak načti trades (což naplní i confluences cache)
-  await getHistoricalTrades();
+  await initializeData();
   return confluencesCache || [];
+}
+
+// Export pro manuální refresh (pokud potřeba)
+export async function refreshData(): Promise<void> {
+  isLoaded = false;
+  await initializeData();
 }

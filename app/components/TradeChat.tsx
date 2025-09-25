@@ -10,7 +10,7 @@ interface QueryResult {
   };
 }
 
-export default function TradeQuery() {
+export default function TradeChat() {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState<QueryResult | null>(null);
   const [loading, setLoading] = useState(false);
