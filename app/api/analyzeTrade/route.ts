@@ -38,7 +38,7 @@ ${index + 1}. ID: ${trade.id}
 
 ÚKOLY:
 1) Najdi v historických datech obchody podobné novému (pozice, confluences, session, Order Type, SL pips, RR). 
-   - Největší váhu dávej shodě confluences jako celku (ne jen jedné). 
+   - Největší váhu dávej shodě confluences jako celku (ne jen jedné).
    - Pokud se neshodují všechny, pracuj s podobností: více shod = vyšší váha. 
    - Menší váhu pak dej session, SL, RR a Order Type. 
    - U každého faktoru zohledni více metrik, ne jen jednu.
@@ -51,15 +51,14 @@ ${index + 1}. ID: ${trade.id}
 
 5) Spočítej průměrný PnL těchto obchodů.
 
-6) Doporuč případné úpravy (RR, SL atd.), pokud by zlepšily pravděpodobnost úspěchu.
+6) Shrň confluence body a jejich vliv na výsledek (pozitivní / negativní).
 
-7) Shrň confluence body a jejich vliv na výsledek (pozitivní / negativní).
-
-8) Podívej se na chyby z podobných obchodů a upozorni na ně.
+7) Podívej se na chyby z podobných obchodů a upozorni na ně.
 
 FORMÁT:
 - Na první řádek: Success rate: X%
 - Na druhý řádek: Podobné obchody: Y
+- Na třetí řádek průměrné PnL
 - Pak vynech jeden řádek.
 - Všechny úkoly přehledně shrň do 10 vět.
 
