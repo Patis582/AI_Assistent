@@ -34,6 +34,7 @@ interface Trade {
   sl: number | null;
   risk: number | null;
   pnl: number | null;
+  mistakes: string[];
 }
 
 // Helper functions s typováním
@@ -84,6 +85,7 @@ async function getHistoricalTrades(): Promise<Trade[]> {
           sl: getProp("S/L Pips")?.number ?? null,
           risk: getProp("% Risk")?.number ?? null,
           pnl: getProp("Gross PnL")?.number ?? null,
+          mistakes: await getRelationTitles(getProp("Mistakes")?.relation || []),
         };
       })
     );
@@ -131,18 +133,36 @@ ${index + 1}. ID: ${trade.id}
    - SL pips: ${trade.sl}
    - PnL: ${trade.pnl}
    - Datum: ${trade.date}
+   - Chyby ${trade.mistakes}
 `).join("")}
 
 ÚKOLY:
-1) Najdi v historických datech podobné obchody jako je nový obchod (podobná pozice, confluences, session, Order Type, SL pips, RR). Největší váhu dávej confluences, pak session, SL, RR, order type.
-    Spočítej success rate těchto úpdpbných obchodů
-2) Vyhodnoť šanci na úspěch nového obchodu 
-3) Konkrétní doporučení (vstup/RR/SL)
-4) Kolik má obchod v průměru PnL
-5) Doporuč případné úpravy (RR, SL, atd.)
-6) Shrň confluence body a jejich vliv na výsledek
-Success rate a podobné obchody napiš uplně první ve formě: Success rate: 80%. Na další řádek Podobné obchody: 10. Potom vynech jeden řádek.
-Všechny ukoly shrň do max 10 vět
+1) Najdi v historických datech obchody podobné novému (pozice, confluences, session, Order Type, SL pips, RR). 
+   - Největší váhu dávej shodě confluences jako celku (ne jen jedné). 
+   - Pokud se neshodují všechny, pracuj s podobností: více shod = vyšší váha. 
+   - Menší váhu pak dej session, SL, RR a Order Type. 
+   - U každého faktoru zohledni více metrik, ne jen jednu.
+
+2) Spočítej success rate těchto podobných obchodů a napiš přesně, kolik jich bylo.
+
+3) Vyhodnoť šanci na úspěch nového obchodu na základě podobností (uveď, které faktory hrají pro/ proti).
+
+4) Uveď konkrétní doporučení pro vstup, RR a SL.
+
+5) Spočítej průměrný PnL těchto obchodů.
+
+6) Doporuč případné úpravy (RR, SL atd.), pokud by zlepšily pravděpodobnost úspěchu.
+
+7) Shrň confluence body a jejich vliv na výsledek (pozitivní / negativní).
+
+8) Podívej se na chyby z podobných obchodů a upozorni na ně.
+
+FORMÁT:
+- Na první řádek: Success rate: X%
+- Na druhý řádek: Podobné obchody: Y
+- Pak vynech jeden řádek.
+- Všechny úkoly shrň maximálně do 10 vět.
+
     `;
 
     const result = await model.generateContent(prompt);
